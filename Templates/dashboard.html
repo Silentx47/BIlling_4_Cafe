@@ -102,6 +102,58 @@
     .db-cards { grid-template-columns: repeat(2,1fr); }
     .db-grid2 { grid-template-columns: 1fr; }
   }
+  .db-form {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.db-input,
+.db-select {
+    flex: 1;
+    min-width: 180px;
+    padding: 12px 16px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    color: #f5e6d3;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.db-input::placeholder {
+    color: rgba(245,230,211,0.45);
+}
+
+.db-input:focus,
+.db-select:focus {
+    border-color: rgba(200,135,58,0.6);
+    box-shadow: 0 0 0 3px rgba(200,135,58,0.15);
+}
+
+.db-select option {
+    background: #4a2c14;
+    color: #f5e6d3;
+}
+
+.db-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #c8873a, #e8b86d);
+    color: #2c1a0e;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.db-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(200,135,58,0.25);
+}
 </style>
 </head>
 <body>
@@ -119,6 +171,8 @@
   <button class="db-nav-item" onclick="showPage('billing', this)"><i class="ti ti-receipt"></i> <span>Sales & Billing</span></button>
   <button class="db-nav-item" onclick="showPage('staff', this)"><i class="ti ti-users"></i> <span>Manage Staff</span></button>
   <button class="db-nav-item" onclick="showPage('reports', this)"><i class="ti ti-chart-bar"></i> <span>Reports</span></button>
+  <button class="db-nav-item" onclick="showPage('new-order', this)"><i class="ti ti-shopping-cart-plus"></i><span>New Order</span></button>
+
   <a href="/logout" class="db-logout"><i class="ti ti-logout"></i> <span>Logout</span></a>
 </div>
 
@@ -166,46 +220,194 @@
 
   <!-- ORDERS -->
   <div class="page" id="page-orders">
+    <div class="db-panel" style="margin-bottom:35px;">
+    <div class="db-panel-title" >
+        <i class="ti ti-shopping-cart"></i>
+        All Orders
+    </div>
+    <table class="db-table">
+        <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Amount</th>
+            <th>Status</th>
+        </tr>
+        {% for order in orders_list %}
+        <tr>
+            <td>{{ order[0] }}</td>
+            <td>{{ order[1] }}</td>
+            <td>₹{{ order[2] }}</td>
+            <td>
+
+    {{ order[3] }}
+
+    {% if order[3] == 'Pending' %}
+
+    <form method="POST"
+          action="/complete_order/{{ order[0] }}"
+          style="display:inline;">
+
+        <button class="db-btn"
+                style="padding:6px 12px;">
+
+            Done
+
+        </button>
+
+    </form>
+
+    {% endif %}
+
+    <form method="POST"
+          action="/delete_order/{{ order[0] }}"
+          style="display:inline;">
+
+        <button class="db-btn"
+                style="
+                    background:#b44444;
+                    margin-left:10px;
+                    padding:6px 12px;">
+
+            Delete
+
+        </button>
+
+    </form>
+
+</td>
+        </tr>
+{% endfor %}</table>
+
+
+</div>
     <div class="db-cards">
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-clipboard-list"></i> Active Orders</div><div class="db-card-value">12</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-check"></i> Completed Today</div><div class="db-card-value">26</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-package"></i> Inventory Items</div><div class="db-card-value">48</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-alert-triangle"></i> Low Stock</div><div class="db-card-value" style="color:#e8b86d">3</div></div>
+      <div class="db-card"><div class="db-card-label"><i class="ti ti-clipboard-list"></i> Active Orders</div><div class="db-card-value">{{ active_orders }}</div></div>
+      <div class="db-card"><div class="db-card-label"><i class="ti ti-check"></i> Completed Today</div><div class="db-card-value">{{ completed_orders }}</div></div>
+      <div class="db-card"><div class="db-card-label"><i class="ti ti-package"></i> Inventory Items</div><div class="db-card-value">{{inventory_items }}</div></div>
+      <div class="db-card"><div class="db-card-label"><i class="ti ti-alert-triangle"></i> Low Stock</div><div class="db-card-value" style="color:#e8b86d">{{ low_stock }}</div></div>
     </div>
     <div class="db-panel">
       <div class="db-panel-title"><i class="ti ti-package"></i> Inventory Status</div>
       <table class="db-table">
-        <tr><th>Item</th><th>Category</th><th>Stock</th><th>Unit</th><th>Status</th></tr>
-        <tr><td>Coffee Beans</td><td>Beverage</td><td>12</td><td>kg</td><td><span class="status-pill status-done">Good</span></td></tr>
-        <tr><td>Whole Milk</td><td>Dairy</td><td>8</td><td>L</td><td><span class="status-pill status-done">Good</span></td></tr>
-        <tr><td>Oat Milk</td><td>Dairy</td><td>2</td><td>L</td><td><span class="status-pill status-pending">Low</span></td></tr>
-        <tr><td>Sugar Syrup</td><td>Sweetener</td><td>1</td><td>bottle</td><td><span class="status-pill status-cancel">Critical</span></td></tr>
-        <tr><td>Croissants</td><td>Bakery</td><td>14</td><td>pcs</td><td><span class="status-pill status-done">Good</span></td></tr>
-        <tr><td>Paper Cups</td><td>Supplies</td><td>3</td><td>packs</td><td><span class="status-pill status-pending">Low</span></td></tr>
+       {% for item in inventory %}
+      <tr>
+      <td>{{ item[0] }}</td>
+      <td>{{ item[1] }}</td>
+      <td>{{ item[2] }}</td>
+      <td>{{ item[3] }}</td>
+
+              <td>
+                  {% if item[2] < 2 %}
+                      <span class="status-pill status-cancel">
+                          Critical
+                      </span>
+
+                  {% elif item[2] < 5 %}
+                      <span class="status-pill status-pending">
+                          Low
+                      </span>
+
+                  {% else %}
+                      <span class="status-pill status-done">
+                          Good
+                      </span>
+                  {% endif %}
+              </td>
+          </tr>
+{% endfor %}
       </table>
     </div>
   </div>
 
   <!-- BILLING -->
   <div class="page" id="page-billing">
-    <div class="db-cards">
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-currency-rupee"></i> Today</div><div class="db-card-value">₹4,820</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-calendar-week"></i> This Week</div><div class="db-card-value">₹28,450</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-calendar-month"></i> This Month</div><div class="db-card-value">₹1,12,300</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-wallet"></i> Avg Order</div><div class="db-card-value">₹268</div></div>
+    <div class="db-panel" style="margin-top:30px;">
+
+    <div class="db-panel-title">
+        <i class="ti ti-history"></i>
+        Sales History
     </div>
+        <table class="db-table">
+          <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Total</th>
+            <th>Payment</th>
+            <th>Date</th>
+        </tr>
+        {% for sale in sales_list %}
+        <tr>
+            <td>{{ sale[0] }}</td>
+            <td>{{ sale[1] }}</td>
+            <td>₹{{ sale[2] }}</td>
+            <td>
+{% if sale[3] %}
+
+                    {{ sale[3] }}
+
+                {% else %}
+
+                    -
+
+                {% endif %}
+
+            </td>
+
+            <td>{{ sale[4] }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
     <div class="db-panel">
-      <div class="db-panel-title"><i class="ti ti-receipt"></i> Recent Transactions</div>
-      <table class="db-table">
-        <tr><th>Bill #</th><th>Items</th><th>Staff</th><th>Payment</th><th>Amount</th></tr>
-        <tr><td>#B1042</td><td>Latte, Croissant</td><td>Priya</td><td>UPI</td><td>₹380</td></tr>
-        <tr><td>#B1041</td><td>Cappuccino x2</td><td>Arjun</td><td>Cash</td><td>₹320</td></tr>
-        <tr><td>#B1040</td><td>Cold Brew</td><td>Priya</td><td>Card</td><td>₹220</td></tr>
-        <tr><td>#B1039</td><td>Mocha, Muffin</td><td>Kiran</td><td>UPI</td><td>₹410</td></tr>
-        <tr><td>#B1038</td><td>Espresso</td><td>Arjun</td><td>Cash</td><td>₹150</td></tr>
-      </table>
+
+    <div class="db-panel-title">
+        <i class="ti ti-receipt"></i>
+        Generate Bill
     </div>
-  </div>
+
+    <form method="POST" action="/create_bill"
+          class="db-form">
+        <select name="payment_method"
+        class="db-select"
+        required>
+
+          <option value="">Payment Method</option>
+
+          <option value="UPI">UPI</option>
+          <option value="Cash">Cash</option>
+          <option value="Card">Card</option>
+
+        </select>
+        <select name="product_id"
+                class="db-select"
+                required>
+
+            <option value="">
+                Select Product
+            </option>
+
+            {% for product in products %}
+
+            <option value="{{ product[0] }}">
+
+                {{ product[1] }} - ₹{{ product[2] }}
+
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+        <input type="number" name="quantity" placeholder="Quantity" min="1" class="db-input" required>
+
+        <button type="submit" class="db-btn">Generate Bill</button>
+    </form>
+</div> 
+</div>
 
   <!-- STAFF -->
   <div class="page" id="page-staff">
@@ -276,7 +478,50 @@
       </div>
     </div>
   </div>
+  <!--New order  -->
+  <div class="page" id="page-new-order">
 
+    <div class="db-panel">
+        <div class="db-panel-title">
+            Create Order
+        </div>
+
+        <form method="POST"
+      action="/add_order"
+      class="db-form">
+
+    <input type="text"
+           name="customer_name"
+           placeholder="Customer Name"
+           class="db-input"
+           required>
+
+    <input type="number"
+           name="total"
+           placeholder="Amount"
+           class="db-input"
+           required>
+
+    <select name="status"
+            class="db-select">
+
+        <option value="Pending">Pending</option>
+        <option value="Done">Done</option>
+
+    </select>
+
+    <button type="submit"
+            class="db-btn">
+
+        Save Order
+
+    </button>
+
+</form>
+
+    </div>
+
+</div>
 </div>
 
 <script>
@@ -290,7 +535,8 @@ function showPage(id, btn) {
     orders: ['Orders & Inventory', 'Manage active orders and stock levels'],
     billing: ['Sales & Billing', 'Track payments and revenue'],
     staff: ['Manage Staff', 'View attendance and staff details'],
-    reports: ['Reports', 'Insights and performance overview']
+    reports: ['Reports', 'Insights and performance overview'],
+    'new-order': ['New Order', 'Create a new customer order']
   };
   document.getElementById('page-title').textContent = titles[id][0];
   document.getElementById('page-sub').textContent = titles[id][1];
