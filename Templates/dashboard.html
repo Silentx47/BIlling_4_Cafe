@@ -154,6 +154,12 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(200,135,58,0.25);
 }
+.db-grid3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
 </style>
 </head>
 <body>
@@ -168,6 +174,7 @@
   </div>
   <button class="db-nav-item active" onclick="showPage('overview', this)"><i class="ti ti-layout-dashboard"></i> <span>Overview</span></button>
   <button class="db-nav-item" onclick="showPage('orders', this)"><i class="ti ti-clipboard-list"></i> <span>Orders & Inventory</span></button>
+  <button class="db-nav-item"onclick="showPage('products', this)"><i class="ti ti-coffee"></i><span>Products</span></button>
   <button class="db-nav-item" onclick="showPage('billing', this)"><i class="ti ti-receipt"></i> <span>Sales & Billing</span></button>
   <button class="db-nav-item" onclick="showPage('staff', this)"><i class="ti ti-users"></i> <span>Manage Staff</span></button>
   <button class="db-nav-item" onclick="showPage('reports', this)"><i class="ti ti-chart-bar"></i> <span>Reports</span></button>
@@ -186,37 +193,130 @@
   </div>
 
   <!-- OVERVIEW -->
-  <div class="page active" id="page-overview">
+<div class="page active" id="page-overview">
+
+    <!-- Top Cards -->
     <div class="db-cards">
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-currency-rupee"></i> Today's Revenue</div><div class="db-card-value">₹4,820</div><div class="db-card-badge badge-up">↑ 12% vs yesterday</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-shopping-bag"></i> Total Orders</div><div class="db-card-value">38</div><div class="db-card-badge badge-up">↑ 5 more than avg</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-users"></i> Staff On Duty</div><div class="db-card-value">6</div><div class="db-card-badge badge-down">1 absent today</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-package"></i> Low Stock Items</div><div class="db-card-value">3</div><div class="db-card-badge badge-down">Needs restocking</div></div>
-    </div>
-    <div class="db-grid2">
-      <div class="db-panel">
-        <div class="db-panel-title"><i class="ti ti-clock"></i> Recent Orders</div>
-        <table class="db-table">
-          <tr><th>Order</th><th>Item</th><th>Amount</th><th>Status</th></tr>
-          <tr><td>#1042</td><td>Latte + Croissant</td><td>₹380</td><td><span class="status-pill status-done">Done</span></td></tr>
-          <tr><td>#1041</td><td>Cappuccino x2</td><td>₹320</td><td><span class="status-pill status-done">Done</span></td></tr>
-          <tr><td>#1040</td><td>Cold Brew</td><td>₹220</td><td><span class="status-pill status-pending">Pending</span></td></tr>
-          <tr><td>#1039</td><td>Mocha + Muffin</td><td>₹410</td><td><span class="status-pill status-done">Done</span></td></tr>
-          <tr><td>#1038</td><td>Espresso</td><td>₹150</td><td><span class="status-pill status-cancel">Cancelled</span></td></tr>
-        </table>
-      </div>
-      <div class="db-panel">
-        <div class="db-panel-title"><i class="ti ti-star"></i> Top Selling Items</div>
-        <div style="margin-top:8px">
-          <div class="db-bar-row"><span class="db-bar-label">Latte</span><div class="db-bar-track"><div class="db-bar-fill" style="width:85%"></div></div><span class="db-bar-val">85%</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Cappuccino</span><div class="db-bar-track"><div class="db-bar-fill" style="width:72%"></div></div><span class="db-bar-val">72%</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Cold Brew</span><div class="db-bar-track"><div class="db-bar-fill" style="width:60%"></div></div><span class="db-bar-val">60%</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Mocha</span><div class="db-bar-track"><div class="db-bar-fill" style="width:48%"></div></div><span class="db-bar-val">48%</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Espresso</span><div class="db-bar-track"><div class="db-bar-fill" style="width:35%"></div></div><span class="db-bar-val">35%</span></div>
+
+        <div class="db-card">
+            <div class="db-card-label">
+                <i class="ti ti-currency-rupee"></i>
+                Today's Revenue
+            </div>
+
+            <div class="db-card-value">
+                ₹{{ today_revenue or 0 }}
+            </div>
         </div>
-      </div>
+
+        <div class="db-card">
+            <div class="db-card-label">
+                <i class="ti ti-shopping-cart"></i>
+                Total Orders
+            </div>
+
+            <div class="db-card-value">
+                {{ total_orders }}
+            </div>
+        </div>
+
+        <div class="db-card">
+            <div class="db-card-label">
+                <i class="ti ti-star"></i>
+                Best Seller
+            </div>
+
+            <div class="db-card-value">
+                {{ top_item_name }}
+            </div>
+
+            <div class="db-card-badge badge-up">
+                {{ top_item_count }} sold
+            </div>
+        </div>
+
+        <div class="db-card">
+            <div class="db-card-label">
+                <i class="ti ti-alert-triangle"></i>
+                Low Stock
+            </div>
+
+            <div class="db-card-value">
+                {{ low_stock }}
+            </div>
+
+            <div class="db-card-badge badge-down">
+                Needs attention
+            </div>
+        </div>
+
     </div>
-  </div>
+
+    <!-- Bottom Panels -->
+    <div class="db-grid3" >
+
+        <!-- Recent Orders -->
+        <div class="db-panel">
+
+            <div class="db-panel-title">
+                Recent Orders
+            </div>
+
+            <table class="db-table">
+
+                <tr>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                </tr>
+
+                {% for order in recent_orders %}
+
+                <tr>
+                    <td>{{ order[0] }}</td>
+
+                    <td>₹{{ order[1] }}</td>
+
+                    <td>{{ order[2] }}</td>
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+        <!-- Sales Overview -->
+        <div class="db-panel">
+
+            <div class="db-panel-title">
+                <i class="ti ti-chart-line"></i>
+                Sales Overview
+            </div>
+
+            <div style="height:250px;">
+                <canvas id="salesChart"></canvas>
+            </div>
+
+        </div>
+
+        <!-- Top Selling Items -->
+        <div class="db-panel">
+
+            <div class="db-panel-title">
+                <i class="ti ti-chart-donut"></i>
+                Top Selling Items
+            </div>
+
+            <div style="height:250px; display:flex; justify-content:center; align-items:center;">
+                <canvas id="donutChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
   <!-- ORDERS -->
   <div class="page" id="page-orders">
@@ -318,6 +418,214 @@
       </table>
     </div>
   </div>
+    <!-- PRODUCTS -->
+<div class="page" id="page-products">
+
+    <div class="db-panel">
+
+        <div style="display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;">
+
+    <div class="db-panel-title"
+         style="margin:0;">
+
+        <i class="ti ti-coffee"></i>
+
+        Product Management
+
+    </div>
+
+    <button class="db-btn"
+            onclick="document.getElementById('add-product-form').style.display='flex'">
+
+        + Add Product
+
+    </button>
+
+</div>
+    <form method="POST"
+      action="/add_product"
+      id="add-product-form"
+      class="db-form"
+      style="display:none; margin-bottom:20px;">
+
+    <input type="text"
+           name="product_name"
+           placeholder="Product Name"
+           class="db-input"
+           required>
+
+    <input type="number"
+           step="0.01"
+           name="price"
+           placeholder="Price"
+           class="db-input"
+           required>
+
+    <button type="submit"
+            class="db-btn">
+
+        Save Product
+
+    </button>
+
+</form>
+
+<table class="db-table">
+
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for product in products %}
+
+    <tr>
+
+        <td>{{ product[0] }}</td>
+
+        <td>{{ product[1] }}</td>
+
+        <td>₹{{ product[2] }}</td>
+        <td>
+
+    <button class="db-btn"
+        onclick="openEditModal(
+            '{{ product[0] }}',
+            '{{ product[1] }}',
+            '{{ product[2] }}'
+        )">
+
+        Edit
+
+    </button>
+
+    <form method="POST"
+          action="/delete_product/{{ product[0] }}"
+          style="display:inline;"
+          onsubmit="return confirm(
+              'Delete {{ product[1] }}?'
+          )">
+
+        <button type="submit"
+                class="db-btn"
+                style="background:#d9534f;">
+
+            Delete
+
+        </button>
+
+    </form>
+
+</td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+<!-- Edit Product Modal -->
+<div id="editModal"
+     onclick="closeModal()"
+     style="
+        display:none;
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,0.75);
+        justify-content:center;
+        align-items:center;
+        z-index:9999;">
+
+    <div onclick="event.stopPropagation()"
+         style="
+            background:rgba(60,40,25,0.95);
+            backdrop-filter:blur(25px);
+            padding:35px;
+            border-radius:25px;
+            min-width:420px;
+            border:1px solid rgba(255,255,255,0.1);
+            box-shadow:0 20px 50px rgba(0,0,0,0.4);">
+
+        <h2 style="
+            margin-top:0;
+            margin-bottom:25px;
+            color:#e0aa5e;">
+
+            ✏️ Edit Product
+
+        </h2>
+
+        <form id="editForm" method="POST">
+
+            <label style="display:block; margin-bottom:8px;">
+                Product Name
+            </label>
+
+            <input type="text"
+                   id="editProductName"
+                   name="product_name"
+                   class="db-input"
+                   style="width:100%;"
+                   required>
+
+            <br><br>
+
+            <label style="display:block; margin-bottom:8px;">
+                Price
+            </label>
+
+            <input type="number"
+                   step="0.01"
+                   id="editProductPrice"
+                   name="price"
+                   class="db-input"
+                   style="width:100%;"
+                   required>
+
+            <br><br>
+
+            <div style="
+                    display:flex;
+                    justify-content:flex-end;
+                    gap:12px;">
+
+                <button type="button"
+                        class="db-btn"
+                        style="background:#6c757d;"
+                        onclick="closeModal()">
+
+                    Cancel
+
+                </button>
+
+                <button type="submit"
+                        class="db-btn">
+
+                    Save
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+    <!-- Modal content -->
+
+</div>
+
+
+
+    </div>
 
   <!-- BILLING -->
   <div class="page" id="page-billing">
@@ -412,116 +720,326 @@
   <!-- STAFF -->
   <div class="page" id="page-staff">
     <div class="db-cards">
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-users"></i> Total Staff</div><div class="db-card-value">8</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-check"></i> On Duty</div><div class="db-card-value">6</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-x"></i> Absent</div><div class="db-card-value">1</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-calendar-off"></i> On Leave</div><div class="db-card-value">1</div></div>
+      <div class="db-card"><div class="db-card-label"><i class="ti ti-users"></i> Total Staff</div><div class="db-card-value">{{ total_staff }}</div></div>
+      <div class="db-card"><div class="db-card-label"><i class="ti ti-check"></i> On Duty</div><div class="db-card-value">{{ on_duty }}</div></div>
+      <div class="db-card"><div class="db-card-label"><i class="ti ti-x"></i> Absent</div><div class="db-card-value">{{ absent }}</div></div>
+      <div class="db-card"><div class="db-card-label"><i class="ti ti-calendar-off"></i> On Leave</div><div class="db-card-value">{{ on_leave }}</div></div>
     </div>
     <div class="db-panel">
       <div class="db-panel-title"><i class="ti ti-users"></i> Staff List</div>
-      <div class="db-staff-row">
-        <div class="db-staff-avatar" style="background:rgba(200,135,58,0.2);color:#c8873a">PR</div>
-        <div><div class="db-staff-name">Priya R.</div><div class="db-staff-role">Barista</div></div>
-        <div class="db-staff-status"><span class="status-pill status-done">On Duty</span></div>
-      </div>
-      <div class="db-staff-row">
-        <div class="db-staff-avatar" style="background:rgba(100,180,120,0.2);color:#7ed89a">AK</div>
-        <div><div class="db-staff-name">Arjun K.</div><div class="db-staff-role">Cashier</div></div>
-        <div class="db-staff-status"><span class="status-pill status-done">On Duty</span></div>
-      </div>
-      <div class="db-staff-row">
-        <div class="db-staff-avatar" style="background:rgba(120,120,200,0.2);color:#a0a0e8">KM</div>
-        <div><div class="db-staff-name">Kiran M.</div><div class="db-staff-role">Barista</div></div>
-        <div class="db-staff-status"><span class="status-pill status-done">On Duty</span></div>
-      </div>
-      <div class="db-staff-row">
-        <div class="db-staff-avatar" style="background:rgba(220,100,100,0.2);color:#e07070">RS</div>
-        <div><div class="db-staff-name">Ravi S.</div><div class="db-staff-role">Waiter</div></div>
-        <div class="db-staff-status"><span class="status-pill status-cancel">Absent</span></div>
-      </div>
-      <div class="db-staff-row">
-        <div class="db-staff-avatar" style="background:rgba(200,160,58,0.2);color:#e8b86d">DP</div>
-        <div><div class="db-staff-name">Divya P.</div><div class="db-staff-role">Chef</div></div>
-        <div class="db-staff-status"><span class="status-pill status-pending">On Leave</span></div>
-      </div>
-    </div>
-  </div>
+      {% for staff in staff_list %}
 
-  <!-- REPORTS -->
-  <div class="page" id="page-reports">
-    <div class="db-cards">
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-trending-up"></i> Best Day</div><div class="db-card-value">Saturday</div><div class="db-card-badge badge-up">↑ ₹7,200 avg</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-star"></i> Top Item</div><div class="db-card-value">Latte</div><div class="db-card-badge badge-up">38% of orders</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-clock"></i> Peak Hour</div><div class="db-card-value">9–11 AM</div><div class="db-card-badge badge-up">Most busy</div></div>
-      <div class="db-card"><div class="db-card-label"><i class="ti ti-chart-bar"></i> Monthly Growth</div><div class="db-card-value">+18%</div><div class="db-card-badge badge-up">vs last month</div></div>
-    </div>
-    <div class="db-grid2">
-      <div class="db-panel">
-        <div class="db-panel-title"><i class="ti ti-chart-bar"></i> Weekly Revenue</div>
-        <div style="margin-top:8px">
-          <div class="db-bar-row"><span class="db-bar-label">Monday</span><div class="db-bar-track"><div class="db-bar-fill" style="width:55%"></div></div><span class="db-bar-val">₹3.8k</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Tuesday</span><div class="db-bar-track"><div class="db-bar-fill" style="width:48%"></div></div><span class="db-bar-val">₹3.2k</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Wednesday</span><div class="db-bar-track"><div class="db-bar-fill" style="width:62%"></div></div><span class="db-bar-val">₹4.4k</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Thursday</span><div class="db-bar-track"><div class="db-bar-fill" style="width:58%"></div></div><span class="db-bar-val">₹4.1k</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Friday</span><div class="db-bar-track"><div class="db-bar-fill" style="width:75%"></div></div><span class="db-bar-val">₹5.3k</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Saturday</span><div class="db-bar-track"><div class="db-bar-fill" style="width:100%"></div></div><span class="db-bar-val">₹7.2k</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Sunday</span><div class="db-bar-track"><div class="db-bar-fill" style="width:80%"></div></div><span class="db-bar-val">₹5.8k</span></div>
-        </div>
-      </div>
-      <div class="db-panel">
-        <div class="db-panel-title"><i class="ti ti-wallet"></i> Payment Methods</div>
-        <div style="margin-top:8px">
-          <div class="db-bar-row"><span class="db-bar-label">UPI</span><div class="db-bar-track"><div class="db-bar-fill" style="width:65%"></div></div><span class="db-bar-val">65%</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Cash</span><div class="db-bar-track"><div class="db-bar-fill" style="width:25%"></div></div><span class="db-bar-val">25%</span></div>
-          <div class="db-bar-row"><span class="db-bar-label">Card</span><div class="db-bar-track"><div class="db-bar-fill" style="width:10%"></div></div><span class="db-bar-val">10%</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!--New order  -->
-  <div class="page" id="page-new-order">
+<div class="db-staff-row">
 
-    <div class="db-panel">
-        <div class="db-panel-title">
-            Create Order
+    <div class="db-staff-avatar">
+        {{ staff[0][:2]|upper }}
+    </div>
+
+    <div>
+        <div class="db-staff-name">
+            {{ staff[0] }}
         </div>
 
-        <form method="POST"
-      action="/add_order"
-      class="db-form">
+        <div class="db-staff-role">
+            {{ staff[1] }}
+        </div>
+    </div>
 
-    <input type="text"
-           name="customer_name"
-           placeholder="Customer Name"
-           class="db-input"
-           required>
+    <div class="db-staff-status">
 
-    <input type="number"
-           name="total"
-           placeholder="Amount"
-           class="db-input"
-           required>
+        {% if staff[2] == 'On Duty' %}
 
-    <select name="status"
-            class="db-select">
+            <span class="status-pill status-done">
+                {{ staff[2] }}
+            </span>
 
-        <option value="Pending">Pending</option>
-        <option value="Done">Done</option>
+        {% elif staff[2] == 'Absent' %}
 
-    </select>
+            <span class="status-pill status-cancel">
+                {{ staff[2] }}
+            </span>
 
-    <button type="submit"
-            class="db-btn">
+        {% else %}
 
-        Save Order
+            <span class="status-pill status-pending">
+                {{ staff[2] }}
+            </span>
 
-    </button>
-
-</form>
+        {% endif %}
 
     </div>
 
 </div>
+
+{% endfor %}
+    </div>
+  </div>
+
+  <!-- REPORTS -->
+<div class="page" id="page-reports">
+
+    <div class="db-cards">
+
+        <div class="db-card">
+            <div class="db-card-label">
+                <i class="ti ti-trending-up"></i> Best Day
+            </div>
+            <div class="db-card-value">{{ best_day }}</div>
+            <div class="db-card-badge badge-up">
+                ↑ ₹{{ best_day_revenue }} avg
+            </div>
+        </div>
+
+        <div class="db-card">
+            <div class="db-card-label">
+                <i class="ti ti-star"></i> Top Item
+            </div>
+            <div class="db-card-value">{{ top_item_name }}</div>
+            <div class="db-card-badge badge-up">
+                {{ top_item_count }} sold
+            </div>
+        </div>
+
+        <div class="db-card">
+            <div class="db-card-label">
+                <i class="ti ti-clock"></i> Peak Hour
+            </div>
+            <div class="db-card-value">{{ peak_hour }}</div>
+            <div class="db-card-badge badge-up">
+                {{ peak_orders }} orders
+            </div>
+        </div>
+
+        <div class="db-card">
+            <div class="db-card-label">
+                <i class="ti ti-chart-bar"></i> Monthly Growth
+            </div>
+            <div class="db-card-value"> {% if growth >= 0 %}
+        +{{ growth }}%
+    {% else %}
+        {{ growth }}%
+    {% endif %}</div>
+            <div class="db-card-badge badge-up">
+                vs last month
+            </div>
+        </div>
+
+    </div>
+
+    <div class="db-grid2">
+
+        <!-- Weekly Revenue -->
+        <div class="db-panel">
+
+            <div class="db-panel-title">
+                <i class="ti ti-chart-bar"></i> Weekly Revenue
+            </div>
+
+            <div style="margin-top:8px">
+
+                {% for day, revenue in week_data.items() %}
+
+                <div class="db-bar-row">
+
+                    <span class="db-bar-label">
+                        {{ day }}
+                    </span>
+
+                    <div class="db-bar-track">
+
+                        <div class="db-bar-fill"
+                             style="width: {{ (revenue / max_revenue * 100)|round }}%;">
+
+                        </div>
+
+                    </div>
+
+                    <span class="db-bar-val">
+                        ₹{{ revenue|round|int }}
+                    </span>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="db-panel">
+
+            <div class="db-panel-title">
+                <i class="ti ti-wallet"></i> Payment Methods
+            </div>
+
+            <div style="margin-top:8px">
+
+                {% for method, count in payments.items() %}
+
+                <div class="db-bar-row">
+
+                    <span class="db-bar-label">
+                        {{ method }}
+                    </span>
+
+                    <div class="db-bar-track">
+
+                        <div class="db-bar-fill"
+                             style="width: {{ (count / max_payment * 100)|round }}%;">
+
+                        </div>
+
+                    </div>
+
+                    <span class="db-bar-val">
+                        {{ count }}
+                    </span>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+    <!-- NEW ORDER -->
+<div class="page" id="page-new-order">
+
+    <div class="db-panel">
+
+        <div class="db-panel-title">
+
+            <i class="ti ti-shopping-cart-plus"></i>
+
+            Create Order
+
+        </div>
+
+        <form method="POST"
+              action="/generate_bill"
+              id="orderForm">
+
+            <input type="text"
+                   name="customer_name"
+                   placeholder="Customer Name"
+                   class="db-input"
+                   required>
+
+            <br><br>
+
+            <select name="payment_method"
+                    class="db-select"
+                    required>
+
+                <option value="">Payment Method</option>
+
+                <option value="Cash">Cash</option>
+
+                <option value="UPI">UPI</option>
+
+                <option value="Card">Card</option>
+
+            </select>
+
+            <br><br>
+
+            <select name="order_type"
+                    class="db-select"
+                    required>
+
+                <option value="">Order Type</option>
+
+                <option value="Dine-In">Dine-In</option>
+
+                <option value="Takeaway">Takeaway</option>
+
+                <option value="Delivery">Delivery</option>
+
+            </select>
+
+            <br><br>
+
+            <table class="db-table">
+
+                <tr>
+
+                    <th>Select</th>
+
+                    <th>Product</th>
+
+                    <th>Price</th>
+
+                    <th>Qty</th>
+
+                </tr>
+
+                {% for product in products %}
+
+                <tr>
+
+                    <td>
+
+                        <input type="checkbox"
+                               class="product-check"
+                               value="{{ product[2] }}"
+                               name="selected_products"
+                               data-id="{{ product[0] }}">
+
+                    </td>
+
+                    <td>{{ product[1] }}</td>
+
+                    <td>₹{{ product[2] }}</td>
+
+                    <td>
+
+                        <input type="number"
+                               min="1"
+                               value="1"
+                               class="db-input quantity"
+                               style="width:80px;"
+                               name="quantity_{{ product[0] }}">
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+            <br>
+
+            <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;">
+
+                <h2>
+
+                    Total:
+                    ₹<span id="orderTotal">0</span>
+
+                </h2>
+
+                <button type="submit"
+                        class="db-btn">
+
+                    Generate Bill
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
 </div>
 
 <script>
@@ -533,6 +1051,7 @@ function showPage(id, btn) {
   const titles = {
     overview: ['Good morning ☕', "Here's what's happening at your cafe today"],
     orders: ['Orders & Inventory', 'Manage active orders and stock levels'],
+    products: ['Products','Manage your cafe menu'],
     billing: ['Sales & Billing', 'Track payments and revenue'],
     staff: ['Manage Staff', 'View attendance and staff details'],
     reports: ['Reports', 'Insights and performance overview'],
@@ -541,6 +1060,141 @@ function showPage(id, btn) {
   document.getElementById('page-title').textContent = titles[id][0];
   document.getElementById('page-sub').textContent = titles[id][1];
 }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+new Chart(document.getElementById('salesChart'), {
+
+    type: 'line',
+
+    data: {
+
+        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+
+        datasets: [{
+
+            data: {{ week_values|tojson }},
+
+            borderColor: '#c8873a',
+
+            borderWidth: 3,
+
+            pointBackgroundColor: '#c8873a',
+
+            pointRadius: 4,
+
+            fill: true,
+
+            backgroundColor: 'rgba(200,135,58,0.2)',
+
+            tension: 0.4
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            }
+
+        }
+
+    }
+
+});
+
+
+new Chart(document.getElementById('donutChart'), {
+
+    type: 'doughnut',
+
+    data: {
+
+        labels: {{ top_labels|tojson }},
+
+        datasets: [{
+
+            data: {{ top_counts|tojson }},
+
+            backgroundColor: [
+
+                '#c8873a',
+
+                '#8b5e3c',
+
+                '#e8b86d',
+
+                '#d4956a',
+
+                '#f0d5b0'
+
+            ],
+
+            borderWidth: 0
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            legend: {
+
+                position: 'bottom',
+
+                labels: {
+
+                    color: '#f5e6d3'
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+<script>
+
+function openEditModal(id, name, price) {
+
+    document.getElementById("editProductName").value = name;
+
+    document.getElementById("editProductPrice").value = price;
+
+    document.getElementById("editForm").action =
+        "/edit_product/" + id;
+
+    document.getElementById("editModal").style.display =
+        "flex";
+}
+
+function closeModal() {
+
+    document.getElementById("editModal").style.display =
+        "none";
+}
+
 </script>
 </body>
 </html>
