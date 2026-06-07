@@ -9,8 +9,8 @@ app.secret_key = 'cafe_secret_key_123'
 
 # MySQL config — update these with your details
 app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'   # ← must be root, not test
-app.config['MYSQL_PASSWORD'] = 'ezra4427'   # ← leave empty if no password
+app.config['MYSQL_USER'] = 'root'   # ← must be root
+app.config['MYSQL_PASSWORD'] = ''   # ← leave empty if no password
 app.config['MYSQL_DB'] = 'cafe_db'
 
 mysql = MySQL(app)
